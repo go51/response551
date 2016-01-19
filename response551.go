@@ -1,6 +1,9 @@
 package response551
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 type RedirectType struct {
 	uri  string
@@ -60,4 +63,19 @@ func (e ErrorType) Message() string {
 
 func (e ErrorType) String() string {
 	return e.message
+}
+
+func Response(w http.ResponseWriter, r *http.Request, data interface{}) {
+	if redirectType, ok := interface{}(data).(RedirectType); ok {
+		// Redirect Type
+		http.Redirect(w, r, redirectType.uri, redirectType.code)
+		return
+	} else if errorType, ok := interface{}(data).(ErrorType); ok {
+		// Error Type
+		http.Error(w, errorType.message, errorType.code)
+		return
+	}
+
+	fmt.Fprintf(w, "%v", data)
+
 }
