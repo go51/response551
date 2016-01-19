@@ -31,3 +31,33 @@ func (r RedirectType) Text() string {
 func (r RedirectType) Uri() string {
 	return r.uri
 }
+
+type ErrorType struct {
+	code    int
+	text    string
+	message string
+}
+
+func Error(code int, message string) ErrorType {
+	return ErrorType{
+		code:    code,
+		text:    http.StatusText(code),
+		message: message,
+	}
+}
+
+func (e ErrorType) Code() int {
+	return e.code
+}
+
+func (e ErrorType) Text() string {
+	return e.text
+}
+
+func (e ErrorType) Message() string {
+	return e.message
+}
+
+func (e ErrorType) String() string {
+	return e.message
+}
