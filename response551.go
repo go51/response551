@@ -2,6 +2,7 @@ package response551
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 )
 
@@ -65,7 +66,7 @@ func (e ErrorType) String() string {
 	return e.message
 }
 
-func Response(w http.ResponseWriter, r *http.Request, data interface{}) {
+func Response(w http.ResponseWriter, r *http.Request, data interface{}, packageName, routeName string) {
 	if redirectType, ok := interface{}(data).(RedirectType); ok {
 		// Redirect Type
 		http.Redirect(w, r, redirectType.uri, redirectType.code)
@@ -74,8 +75,42 @@ func Response(w http.ResponseWriter, r *http.Request, data interface{}) {
 		// Error Type
 		http.Error(w, errorType.message, errorType.code)
 		return
+	} else if _, ok := interface{}(data).(map[string]interface{}); ok {
+		// View template rendering
+		html(w, data, packageName, routeName)
+		return
 	}
 
 	fmt.Fprintf(w, "%v", data)
+
+}
+
+func html(w http.ResponseWriter, data interface{}, packageName, routeName string) {
+
+	templates := []string{
+		"view/template/base.html",
+		"view/" + packageName + "/" + routeName + ".html",
+	}
+
+	tmpl, err := template.New(packageName + routeName).Funcs(funcMap()).ParseFiles(templates...)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+}
+
+func funcMap() template.FuncMap {
+	funcMap := template.FuncMap{}
+
+	funcMap["raw"] = func(text string) template.HTML { return template.HTML(text) }
+
+	return funcMap
 
 }
