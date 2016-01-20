@@ -1,7 +1,9 @@
 package response551
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/go51/string551"
 	"html/template"
 	"net/http"
 )
@@ -76,8 +78,12 @@ func Response(w http.ResponseWriter, r *http.Request, data interface{}, packageN
 		http.Error(w, errorType.message, errorType.code)
 		return
 	} else if _, ok := interface{}(data).(map[string]interface{}); ok {
-		// View template rendering
-		html(w, data, packageName, routeName)
+		if isJSON(r) {
+			jsonOutput(w, data)
+		} else {
+			// View template rendering
+			htmlOutput(w, data, packageName, routeName)
+		}
 		return
 	}
 
@@ -85,7 +91,17 @@ func Response(w http.ResponseWriter, r *http.Request, data interface{}, packageN
 
 }
 
-func html(w http.ResponseWriter, data interface{}, packageName, routeName string) {
+func isJSON(r *http.Request) bool {
+	format := string551.Lower(r.FormValue("format"))
+
+	if format == "json" {
+		return true
+	} else {
+		return false
+	}
+}
+
+func htmlOutput(w http.ResponseWriter, data interface{}, packageName, routeName string) {
 
 	templates := []string{
 		"view/template/base.html",
@@ -104,6 +120,16 @@ func html(w http.ResponseWriter, data interface{}, packageName, routeName string
 		return
 	}
 
+}
+
+func jsonOutput(w http.ResponseWriter, data interface{}) {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		panic(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
 
 func funcMap() template.FuncMap {
