@@ -15,10 +15,6 @@ type RedirectType struct {
 }
 
 func Redirect(uri string, code int) RedirectType {
-	if code != 301 && code != 302 {
-		code = 302
-	}
-
 	return RedirectType{
 		uri:  uri,
 		code: code,
