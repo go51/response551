@@ -64,7 +64,7 @@ func (e ErrorType) String() string {
 	return e.message
 }
 
-func Response(w http.ResponseWriter, r *http.Request, data interface{}, packageName, routeName string) {
+func Response(w http.ResponseWriter, r *http.Request, data interface{}, packageName, routeName string, user interface{}) {
 	if redirectType, ok := interface{}(data).(RedirectType); ok {
 		// Redirect Type
 		http.Redirect(w, r, redirectType.uri, redirectType.code)
@@ -73,12 +73,13 @@ func Response(w http.ResponseWriter, r *http.Request, data interface{}, packageN
 		// Error Type
 		http.Error(w, errorType.message, errorType.code)
 		return
-	} else if _, ok := interface{}(data).(map[string]interface{}); ok {
+	} else if param, ok := interface{}(data).(map[string]interface{}); ok {
 		if isJSON(r) {
-			jsonOutput(w, data)
+			jsonOutput(w, param)
 		} else {
 			// View template rendering
-			htmlOutput(w, data, packageName, routeName)
+			param["user"] = user
+			htmlOutput(w, param, packageName, routeName)
 		}
 		return
 	}
@@ -131,7 +132,9 @@ func jsonOutput(w http.ResponseWriter, data interface{}) {
 func funcMap() template.FuncMap {
 	funcMap := template.FuncMap{}
 
-	funcMap["raw"] = func(text string) template.HTML { return template.HTML(text) }
+	funcMap["raw"] = func(text string) template.HTML {
+		return template.HTML(text)
+	}
 
 	return funcMap
 
