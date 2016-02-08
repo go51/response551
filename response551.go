@@ -135,7 +135,12 @@ func funcMap() template.FuncMap {
 	funcMap["raw"] = func(text string) template.HTML {
 		return template.HTML(text)
 	}
+	funcMap["url"] = UrlFunction
 
 	return funcMap
 
 }
+
+type urlFunc func(name string, parameter ...string) string
+
+var UrlFunction urlFunc
