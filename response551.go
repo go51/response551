@@ -136,6 +136,8 @@ func funcMap() template.FuncMap {
 		return template.HTML(text)
 	}
 	funcMap["url"] = UrlFunction
+	funcMap["rightRune"] = string551.RightRune
+	funcMap["right"] = string551.Right
 
 	return funcMap
 
