@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go51/string551"
+	"github.com/go51/time551"
 	"html/template"
 	"net/http"
 )
@@ -138,6 +139,7 @@ func funcMap() template.FuncMap {
 	funcMap["url"] = UrlFunction
 	funcMap["rightRune"] = string551.RightRune
 	funcMap["right"] = string551.Right
+	funcMap["elapsed"] = time551.Elapsed
 
 	return funcMap
 
