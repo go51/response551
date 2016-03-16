@@ -65,7 +65,7 @@ func (e ErrorType) String() string {
 	return e.message
 }
 
-func Response(w http.ResponseWriter, r *http.Request, data interface{}, packageName, routeName string, user interface{}) {
+func Response(w http.ResponseWriter, r *http.Request, data interface{}, packageName, routeName string, user interface{}, appConfig interface{}) {
 	if redirectType, ok := interface{}(data).(RedirectType); ok {
 		// Redirect Type
 		http.Redirect(w, r, redirectType.uri, redirectType.code)
@@ -80,6 +80,7 @@ func Response(w http.ResponseWriter, r *http.Request, data interface{}, packageN
 		} else {
 			// View template rendering
 			param["user"] = user
+			param["config"] = appConfig
 			htmlOutput(w, param, packageName, routeName)
 		}
 		return
