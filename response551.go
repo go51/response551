@@ -1,6 +1,7 @@
 package response551
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/go51/string551"
@@ -113,11 +114,15 @@ func htmlOutput(w http.ResponseWriter, data interface{}, packageName, routeName 
 		return
 	}
 
-	err = tmpl.ExecuteTemplate(w, "base", data)
+	buf := &bytes.Buffer{}
+
+	err = tmpl.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
+	fmt.Fprint(w, buf)
 
 }
 
