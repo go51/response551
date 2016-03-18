@@ -101,17 +101,27 @@ func isJSON(r *http.Request) bool {
 	}
 }
 
+var templates = make(map[string]*template.Template)
+
 func htmlOutput(w http.ResponseWriter, data interface{}, packageName, routeName string) {
 
-	templates := []string{
-		"view/template/base.html",
-		"view/" + packageName + "/" + routeName + ".html",
-	}
+	var err error = nil
+	tmpl := templates[packageName+"/"+routeName]
 
-	tmpl, err := template.New(packageName + routeName).Funcs(funcMap()).ParseFiles(templates...)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
+	if tmpl == nil {
+		templateFiles := []string{
+			"view/template/base.html",
+			"view/" + packageName + "/" + routeName + ".html",
+		}
+
+		tmpl, err = template.New(packageName + "/" + routeName).Funcs(funcMap()).ParseFiles(templateFiles...)
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		templates[packageName+"/"+routeName] = tmpl
+
 	}
 
 	buf := &bytes.Buffer{}
