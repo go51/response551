@@ -8,6 +8,7 @@ import (
 	"github.com/go51/time551"
 	"html/template"
 	"net/http"
+	"os"
 )
 
 type RedirectType struct {
@@ -120,7 +121,9 @@ func htmlOutput(w http.ResponseWriter, data interface{}, packageName, routeName 
 			return
 		}
 
-		templates[packageName+"/"+routeName] = tmpl
+		if getConfigEnv() == "prod" {
+			templates[packageName+"/"+routeName] = tmpl
+		}
 
 	}
 
@@ -164,3 +167,7 @@ func funcMap() template.FuncMap {
 type urlFunc func(name string, parameter ...string) string
 
 var UrlFunction urlFunc
+
+func getConfigEnv() string {
+	return os.Getenv("GORAI_ENV")
+}
