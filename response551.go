@@ -156,6 +156,7 @@ func funcMap() template.FuncMap {
 		return template.HTML(text)
 	}
 	funcMap["url"] = UrlFunction
+	funcMap["urlAbs"] = UrlAbs
 	funcMap["rightRune"] = string551.RightRune
 	funcMap["right"] = string551.Right
 	funcMap["elapsed"] = time551.Elapsed
@@ -170,4 +171,10 @@ var UrlFunction urlFunc
 
 func getConfigEnv() string {
 	return os.Getenv("GORAI_ENV")
+}
+
+var BaseUrl string
+
+func UrlAbs(name string, parameter ...string) string {
+	return BaseUrl + UrlFunction(name, parameter...)
 }
