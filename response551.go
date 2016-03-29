@@ -110,9 +110,17 @@ func htmlOutput(w http.ResponseWriter, data interface{}, packageName, routeName 
 	tmpl := templates[packageName+"/"+routeName]
 
 	if tmpl == nil {
-		templateFiles := []string{
-			"view/template/base.html",
-			"view/" + packageName + "/" + routeName + ".html",
+		var templateFiles []string
+		if packageName != "admin" {
+			templateFiles = []string{
+				"view/template/base.html",
+				"view/" + packageName + "/" + routeName + ".html",
+			}
+		} else {
+			templateFiles = []string{
+				"view/template/base_admin.html",
+				"view/" + packageName + "/" + routeName + ".html",
+			}
 		}
 
 		tmpl, err = template.New(packageName + "/" + routeName).Funcs(funcMap()).ParseFiles(templateFiles...)
